@@ -99,15 +99,18 @@ std::vector<std::vector<CellPosition>> Solution1::GetPaths1(
     std::cout << "row or col size is 0!" << std::endl;
     return paths;
   }
+  // vector size cannot be too large
   size_t u_max = std::vector<uint64_t>().max_size();
   if (M < 0 || M > u_max || N < 0 || N > u_max) {
     std::cout << "row or col size invlid!" << std::endl;
     return paths;
   }
+  // set private parameters
   row_count_ = M;
   col_count_ = N;
   snakes_ = snakes;
   std::vector<CellPosition> temp_path;
+  // call corresponding dfs function
   DfsPath1(0, 0, &temp_path, &paths);
   return paths;
 }
@@ -118,15 +121,21 @@ void Solution1::DfsPath1(const size_t row, const size_t col,
   if (nullptr == temp_path || nullptr == paths) {
     std::cout << "input nullptr!" << std::endl;
   }
+  // return condition:
+  // 1. row or col idx overflow, upper overflow in question A-D
+  // 2. there is a snake in current cell
   if (row > row_count_ - 1 || col > col_count_ - 1 ||
       std::find(snakes_.begin(), snakes_.end(), CellPosition(row, col)) !=
           snakes_.end()) {
     return;
   }
+  // add current cell to current path when return condition is not met
   temp_path->emplace_back(row, col);
   if (row == row_count_ - 1 && col == col_count_ - 1) {
+    // add current path to results when target is reached
     paths->emplace_back(*temp_path);
   } else {
+    // continue to do dfs when target is not reached
     DfsPath1(row + 1, col, temp_path, paths);
     DfsPath1(row, col + 1, temp_path, paths);
   }
@@ -139,16 +148,19 @@ std::vector<std::vector<CellPosition>> Solution1::GetPaths2(
     std::cout << "row or col size is 0!" << std::endl;
     return paths;
   }
+  // vector size cannot be too large
   size_t u_max = std::vector<uint64_t>().max_size();
   if (M < 0 || M > u_max || N < 0 || N > u_max) {
     std::cout << "row or col size invlid!" << std::endl;
     return paths;
   }
+  // set private parameters
   row_count_ = M;
   col_count_ = N;
   snakes_ = snakes;
   visited_ = std::vector<std::vector<bool>>(M, std::vector<bool>(N, false));
   std::vector<CellPosition> temp_path;
+  // call corresponding dfs function
   DfsPath2(0, 0, &temp_path, &paths);
   return paths;
 }
@@ -159,21 +171,30 @@ void Solution1::DfsPath2(const size_t row, const size_t col,
   if (nullptr == temp_path || nullptr == paths) {
     std::cout << "input nullptr!" << std::endl;
   }
+  // return condition:
+  // 1. row or col idx overflow, both lower and upper overflow in question E
+  // 2. the cell has been marked as visited
+  // 3. there is a snake in current cell
   if (row < 0 || row > row_count_ - 1 || col < 0 || col > col_count_ - 1 ||
       visited_.at(row).at(col) ||
       std::find(snakes_.begin(), snakes_.end(), CellPosition(row, col)) !=
           snakes_.end()) {
     return;
   }
+  // add current cell to current path when return condition is not met
   temp_path->emplace_back(row, col);
+  // mark current cell as visited before continue
   visited_.at(row).at(col) = true;
   if (row == row_count_ - 1 && col == col_count_ - 1) {
+    // add current path to results when target is reached
     paths->emplace_back(*temp_path);
   } else {
+    // continue to do dfs when target is not reached
     DfsPath2(row - 1, col, temp_path, paths);
     DfsPath2(row, col - 1, temp_path, paths);
     DfsPath2(row + 1, col, temp_path, paths);
     DfsPath2(row, col + 1, temp_path, paths);
   }
+  // unmark current cell as visited before return
   visited_.at(row).at(col) = false;
 }
